@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -87,6 +87,10 @@ contract BinaryVault is
 
     function unpauseVault() external onlyAdmin {
         _unpause();
+    }
+
+    function getUnderlyingToken() external view returns (IERC20) {
+        return underlyingToken;
     }
 
     /**

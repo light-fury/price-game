@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./interfaces/IBinaryMarket.sol";
-import "./BinaryVault.sol";
+import "./interfaces/IBinaryVault.sol";
 import "./Oracle.sol";
 
 // fixme I would personally get rid of roundid in oracle. Its redundant information. No need to have it in oracle and I would like if possible to switch oracle to chain link (to allow to write it like we can not that we will do it). That means we can use same oracle for perps. We want to configure perps from existing contracts we have. Less code we need to test and maintain.
@@ -44,7 +44,7 @@ contract BinaryMarket is
     /// @dev Market Data
     string public marketName;
     Oracle public oracle;
-    BinaryVault public vault;
+    IBinaryVault public vault;
 
     IERC20 public underlyingToken;
 
@@ -162,7 +162,7 @@ contract BinaryMarket is
         if (timeframes_.length == 0) revert("INVALID_TIMEFRAMES()");
 
         oracle = Oracle(oracle_);
-        vault = BinaryVault(vault_);
+        vault = IBinaryVault(vault_);
 
         marketName = marketName_;
         adminAddress = adminAddress_;
@@ -173,9 +173,12 @@ contract BinaryMarket is
             timeframes.push(timeframes_[i]);
         }
 
-        underlyingToken = vault.underlyingToken();
+        underlyingToken = vault.getUnderlyingToken();
     }
 
+    function getUnderlyingToken() external view returns (IERC20) {
+        return underlyingToken;
+    }
     /**
      * @notice Set oracle of underlying token of this market
      * @dev Only owner can set the oracle

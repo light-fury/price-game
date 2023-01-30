@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.10;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface IBinaryMarket {
     enum Position {
@@ -32,4 +34,6 @@ interface IBinaryMarket {
     ) external;
 
     function getExecutableTimeframes() external view returns(uint8[] memory, uint256);
+
+    function getUnderlyingToken() external view returns (IERC20);
 }

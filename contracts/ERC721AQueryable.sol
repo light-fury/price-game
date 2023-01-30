@@ -2,7 +2,7 @@
 // ERC721A Contracts v4.2.2
 // Creator: Chiru Labs
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.10;
 
 import './interfaces/IERC721AQueryable.sol';
 import './ERC721A.sol';
