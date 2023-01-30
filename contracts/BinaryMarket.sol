@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "./interfaces/IBinaryMarket.sol";
 import "./interfaces/IBinaryVault.sol";
-import "./Oracle.sol";
+import "./interfaces/IOracle.sol";
 
 // fixme I would personally get rid of roundid in oracle. Its redundant information. No need to have it in oracle and I would like if possible to switch oracle to chain link (to allow to write it like we can not that we will do it). That means we can use same oracle for perps. We want to configure perps from existing contracts we have. Less code we need to test and maintain.
 // fixme decide if use error constants or error string, not both. Better to use "ERROR_LIKE_THIS" then "like this"
@@ -43,7 +43,7 @@ contract BinaryMarket is
 
     /// @dev Market Data
     string public marketName;
-    Oracle public oracle;
+    IOracle public oracle;
     IBinaryVault public vault;
 
     IERC20 public underlyingToken;
@@ -161,7 +161,7 @@ contract BinaryMarket is
         if (vault_ == address(0)) revert("ZERO_ADDRESS()");
         if (timeframes_.length == 0) revert("INVALID_TIMEFRAMES()");
 
-        oracle = Oracle(oracle_);
+        oracle = IOracle(oracle_);
         vault = IBinaryVault(vault_);
 
         marketName = marketName_;
@@ -187,7 +187,7 @@ contract BinaryMarket is
     function setOracle(address oracle_) external onlyAdmin {
         if (oracle_ == address(0)) revert("ZERO_ADDRESS()");
         emit OracleChanged(address(oracle), oracle_);
-        oracle = Oracle(oracle_);
+        oracle = IOracle(oracle_);
     }
 
     /**
@@ -241,18 +241,18 @@ contract BinaryMarket is
      * @dev Get latest recorded price from oracle
      */
     function _getPriceFromOracle() internal returns (uint256, uint256, uint256) {
-        (uint256 roundId, uint256 timestamp, uint256 price, ) = oracle.latestRoundData();
+        IOracle.Round memory latestRound = oracle.getLatestRoundData();
         require(
-            roundId > oracleLatestRoundId,
+            latestRound.roundId > oracleLatestRoundId,
             "Oracle update roundId must be larger than oracleLatestRoundId"
         );
-        oracleLatestRoundId = roundId;
-        return (roundId, price, timestamp);
+        oracleLatestRoundId = latestRound.roundId;
+        return (latestRound.roundId, latestRound.price, latestRound.timestamp);
     }
 
     function _writeOraclePrice(uint256 timestamp, uint256 price) internal {
-        (uint256 roundId, , , ) = oracle.latestRoundData();
-        oracle.writePrice(roundId + 1, timestamp, price);
+        IOracle.Round memory latestRound = oracle.getLatestRoundData();
+        oracle.writePrice(latestRound.roundId + 1, timestamp, price);
     }
 
     /**

@@ -8,4 +8,9 @@ interface IBinaryConfig {
     function setClaimNoticePeriod(uint256 newNoticePeriod) external;
 
     function setTreasury(address newTreasury) external;
+
+    function getFeeBase() external pure returns (uint256);
+    function getTradingFee() external view returns (uint256);
+    function getClaimNoticePeriod() external view returns (uint256);
+    function getTreasury() external view returns (address);
 }

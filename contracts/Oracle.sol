@@ -7,12 +7,6 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/IOracle.sol";
 
 contract Oracle is AccessControl, IOracle {
-    struct Round {
-        uint256 roundId;
-        uint256 timestamp;
-        uint256 price;
-        address writer;
-    }
     // fixme can we get rid of roundid on oracle? Why do I care about roundid here, how to find which next roundid should I use
 
     bytes32 public constant WRITER_ROLE = keccak256("GAME_ORACLE_WRITER");
@@ -54,6 +48,10 @@ contract Oracle is AccessControl, IOracle {
     constructor() {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setRoleAdmin(WRITER_ROLE, DEFAULT_ADMIN_ROLE);
+    }
+
+    function getLatestRoundData() external view returns (Round memory) {
+        return latestRoundData;
     }
 
     /// @dev Return `true` if the account belongs to the admin role.

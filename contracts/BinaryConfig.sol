@@ -40,4 +40,20 @@ contract BinaryConfig is Ownable, IBinaryConfig {
         if (newTreasury == address(0)) revert("ZERO_ADDRESS()");
         treasury = newTreasury;
     }
+
+    function getFeeBase() external pure returns (uint256) {
+        return FEE_BASE;
+    }
+
+    function getTradingFee() external view returns (uint256) {
+        return tradingFee;
+    }
+
+    function getClaimNoticePeriod() external view returns (uint256) {
+        return claimNoticePeriod;
+    }
+
+    function getTreasury() external view returns (address) {
+        return treasury;
+    }
 }
