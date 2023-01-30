@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./ERC721AQueryable.sol";
 import "./interfaces/IBinaryVault.sol";
-import "./BinaryConfig.sol";
+import "./interfaces/IBinaryConfig.sol";
 
 /**
  * @title Vault of Binary Option Trading
@@ -24,7 +24,7 @@ contract BinaryVault is
     using SafeERC20 for IERC20;
     uint256 public constant MINIMUM_LIQUIDITY = 10**3;
 
-    BinaryConfig public config;
+    IBinaryConfig public config;
 
     uint256 public vaultId;
     IERC20 public underlyingToken;
@@ -72,7 +72,7 @@ contract BinaryVault is
         if (config_ == address(0)) revert("ZERO_ADDRESS()");
 
         underlyingToken = IERC20(underlyingToken_);
-        config = BinaryConfig(config_);
+        config = IBinaryConfig(config_);
         vaultId = vaultId_;
         adminAddress = admin_;
     }
@@ -353,8 +353,8 @@ contract BinaryVault is
      * @return claimAmount Actual claimable amount
      */
     function _cutTradingFee(uint256 amount) internal returns (uint256) {
-        uint256 fee = (amount * config.tradingFee()) / config.FEE_BASE();
-        underlyingToken.safeTransfer(config.treasury(), fee);
+        uint256 fee = (amount * config.getTradingFee()) / config.getFeeBase();
+        underlyingToken.safeTransfer(config.getTreasury(), fee);
         feeAccrued += fee;
 
         return amount - fee;
@@ -419,7 +419,7 @@ contract BinaryVault is
     /**
     * @dev set config
     */
-    function setConfig(BinaryConfig _config) external onlyAdmin {
+    function setConfig(IBinaryConfig _config) external onlyAdmin {
         require(address(_config) != address(0), "Invalid address");
         config = _config;
 
